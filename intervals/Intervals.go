@@ -42,7 +42,21 @@ func (in IntervalBase ) Join( in2 Interval ) (IntervalBase, error) {
 
 }
 
-func (in IntervalBase) Split( time.Time ) ([2]IntervalBase, error) {
+type IntervalSequence []IntervalBase
 
-	return [2]IntervalBase{IntervalBase{},IntervalBase{}}, fmt.Errorf("not implemented")
+func (in IntervalBase) Split( time.Time ) (IntervalSequence, error) {
+
+
+	seq := make([]IntervalBase, 2, 2 )
+	seq[0] = IntervalBase{}
+	seq[1] = IntervalBase{}
+	return seq, fmt.Errorf("not implemented")
+}
+
+
+func (seq IntervalSequence) Start() time.Time{
+	return seq[0].Start()
+}
+func (seq IntervalSequence) End() time.Time{
+	return seq[len(seq)-1].End()
 }
