@@ -12,16 +12,21 @@ import (
 
 
 type PoohInterval struct {
-	intervals.IntervalBase
+	intervals.Interval
 	Name  string
 }
 
-func (in PoohInterval ) String() string {
-	return fmt.Sprintf( "PoohInterval||%s||%s", in.Name, in.IntervalBase.String() )
+func makePoohInterval( start time.Time, end time.Time, name string) PoohInterval {
+	in, _ := intervals.MakeInterval(start, end)
+	return PoohInterval{in, name}
 }
 
-func (in PoohInterval ) Join( in2 intervals.Interval ) (PoohInterval, error){
-	iResult, err := in.IntervalBase.Join(in2)
+func (in PoohInterval ) String() string {
+	return fmt.Sprintf( "PoohInterval||%s||%s", in.Name, in.Interval.Start().String() )
+}
+
+func (in PoohInterval ) Join( in2 PoohInterval ) (PoohInterval, error){
+	iResult, err := in.Interval.Join(in2.Interval)
 	if err == nil{
 		return PoohInterval{iResult, in.Name}, nil
 	}else {
@@ -35,8 +40,8 @@ func (in PoohInterval ) Join( in2 intervals.Interval ) (PoohInterval, error){
 
 func main() {
 	t := time.Now()
-	i1 := PoohInterval{intervals.IntervalBase{t, t.Add(time.Hour * 2)}, "Pooh Bear Time"}
-	i2 := PoohInterval{intervals.IntervalBase{t.Add(time.Hour * 1), t.Add(time.Hour * 4)}, "Pooh Stick Time"}
+	i1 := makePoohInterval(t, t.Add(time.Hour * 2), "Pooh Bear Time")
+	i2 := makePoohInterval(t.Add(time.Hour * 1), t.Add(time.Hour * 4), "Pooh Stick Time")
 	fmt.Println( i1)
 	fmt.Println( i2)
 
