@@ -37,7 +37,6 @@ func TestMakeInterval(tst *testing.T) {
 	}
 }
 
-
 func TestIntervalContiguousJoin(tst *testing.T){
 
 	t := time.Now()
@@ -72,7 +71,6 @@ func TestIntervalContiguousJoin(tst *testing.T){
 
 }
 
-
 func TestIntervalOverlapJoin(tst *testing.T){
 
 	t := time.Now()
@@ -105,8 +103,6 @@ func TestIntervalOverlapJoin(tst *testing.T){
 	}
 
 }
-
-
 
 func TestIntervalNonContiguousJoin(tst *testing.T){
 
@@ -172,8 +168,6 @@ func TestIntervalNonContiguousJoin(tst *testing.T){
 
 }
 
-
-
 func TestIntervalSplit(tst *testing.T){
 
 	t := time.Now()
@@ -213,8 +207,6 @@ func TestIntervalSplit(tst *testing.T){
 
 }
 
-
-
 func TestIntervalSplitOutOfBounds(tst *testing.T){
 
 	t := time.Now()
@@ -233,7 +225,6 @@ func TestIntervalSplitOutOfBounds(tst *testing.T){
 	}
 
 }
-
 
 func TestIntervalSequence_String(tst *testing.T) {
 
@@ -270,17 +261,17 @@ func TestIntervalSequence_Join(tst *testing.T) {
 	case !seq[0].End().Equal(t.Add(time.Hour*1)) :
 		tst.Errorf("unexpected end of first split. Expected: %v  got:%v", t.Add(time.Hour*1), seq[0].End() );
 
-	case !seq[1].Start().Equal(t.Add(time.Hour*1)) :
-		tst.Errorf("unexpected start of second split. Expected: %v  got:%v", t.Add(time.Hour*1), seq[1].Start() );
+	case !seq[1].Start().Equal(t.Add(time.Hour*2)) :
+		tst.Errorf("unexpected start of second split. Expected: %v  got:%v", t.Add(time.Hour*2), seq[1].Start() );
 
-	case !seq[1].End().Equal(t.Add(time.Hour*2)) :
-		tst.Errorf("unexpected end of second split. Expected: %v  got:%v", t.Add(time.Hour*2), seq[1].End() );
+	case !seq[1].End().Equal(t.Add(time.Hour*3)) :
+		tst.Errorf("unexpected end of second split. Expected: %v  got:%v", t.Add(time.Hour*3), seq[1].End() );
 
 	case !seq.Start().Equal(t):
 		tst.Errorf("unexpected start of sequence. Expected: %v  got:%v", t, seq[0].Start() );
 
-	case !seq.End().Equal(t.Add(time.Hour*2)):
-		tst.Errorf("unexpected start of sequence. Expected: %v  got:%v", t, seq[0].Start() );
+	case !seq.End().Equal(t.Add(time.Hour*3)):
+		tst.Errorf("unexpected start of sequence. Expected: %v  got:%v", t.Add(time.Hour*3), seq[0].Start() );
 
 
 
@@ -327,6 +318,69 @@ func TestIntervalSequence_Split(tst *testing.T) {
 
 	case !seq[3].End().Equal(t.Add(time.Hour*4)) :
 		tst.Errorf("unexpected end of second split. Expected: %v  got:%v", t.Add(time.Hour*4), seq[1].End() );
+
+	case !seq.Start().Equal(t):
+		tst.Errorf("unexpected start of sequence. Expected: %v  got:%v", t, seq[0].Start() );
+
+	case !seq.End().Equal(t.Add(time.Hour*4)):
+		tst.Errorf("unexpected start of sequence. Expected: %v  got:%v", t.Add(time.Hour*4), seq[0].Start() );
+
+
+
+	}
+
+}
+
+
+
+
+func TestIntervalSequence_MergedJoin(tst *testing.T) {
+
+	t := time.Now()
+	seq1, _ := MakeIntervalSequence(t, t.Add(time.Hour *2))
+	seq2, _ := MakeIntervalSequence(t.Add(time.Minute*90), t.Add(time.Hour*4))
+
+	seq1, _ = seq1.Split(t.Add(time.Hour *1))
+	seq2, _ = seq2.Split(t.Add(time.Hour *3))
+
+	switch seq, err := seq1.Join(seq2); {
+
+	case err != nil:
+		tst.Error(err)
+
+	case len(seq) != 5:
+		tst.Errorf("unexpected sequence size:%d  expected  %d", len(seq), 5 );
+		tst.Errorf(seq.Details())
+
+	case !seq[0].Start().Equal(t) :
+		tst.Errorf("unexpected start of first split. Expected: %v  got:%v", t, seq[0].Start() );
+
+	case !seq[0].End().Equal(t.Add(time.Hour*1)) :
+		tst.Errorf("unexpected end of first split. Expected: %v  got:%v", t.Add(time.Hour*1), seq[0].End() );
+
+	case !seq[1].Start().Equal(t.Add(time.Hour*1)) :
+		tst.Errorf("unexpected start of second split. Expected: %v  got:%v", t.Add(time.Hour*1), seq[1].Start() );
+
+	case !seq[1].End().Equal(t.Add(time.Minute*90)) :
+		tst.Errorf("unexpected end of second split. Expected: %v  got:%v", t.Add(time.Minute*90), seq[1].End() );
+
+	case !seq[2].Start().Equal(t.Add(time.Minute*90)) :
+		tst.Errorf("unexpected start of second split. Expected: %v  got:%v", t.Add(time.Minute*90), seq[2].Start() );
+
+	case !seq[2].End().Equal(t.Add(time.Hour*2)) :
+		tst.Errorf("unexpected end of second split. Expected: %v  got:%v", t.Add(time.Hour*2), seq[2].End() );
+
+	case !seq[3].Start().Equal(t.Add(time.Hour*3)) :
+		tst.Errorf("unexpected start of second split. Expected: %v  got:%v", t.Add(time.Hour*3), seq[3].Start() );
+
+	case !seq[3].End().Equal(t.Add(time.Hour*3)) :
+		tst.Errorf("unexpected end of second split. Expected: %v  got:%v", t.Add(time.Hour*3), seq[3].End() );
+
+	case !seq[4].Start().Equal(t.Add(time.Hour*3)) :
+		tst.Errorf("unexpected start of second split. Expected: %v  got:%v", t.Add(time.Hour*3), seq[4].Start() );
+
+	case !seq[4].End().Equal(t.Add(time.Hour*4)) :
+		tst.Errorf("unexpected end of second split. Expected: %v  got:%v", t.Add(time.Hour*4), seq[4].End() );
 
 	case !seq.Start().Equal(t):
 		tst.Errorf("unexpected start of sequence. Expected: %v  got:%v", t, seq[0].Start() );

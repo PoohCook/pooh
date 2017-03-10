@@ -4,8 +4,8 @@ package intervals
 import (
 	"fmt"
 	"time"
-
 	"errors"
+
 )
 
 
@@ -15,7 +15,7 @@ type Interval interface{
 	End() time.Time
 	Join( in2 Interval ) (IntervalSequence, error)
 	Split( spTime time.Time ) (IntervalSequence, error)
-
+	Merge( in2 Interval ) (IntervalSequence, error)
 }
 
 type intervalBase struct {
@@ -69,36 +69,7 @@ func (in intervalBase) Split( spTime time.Time ) ( rSeq IntervalSequence, err er
 	return
 }
 
-
-
-type IntervalSequence []Interval
-
-func MakeIntervalSequence( start, end time.Time) ( rSeq IntervalSequence, err error) {
-	i1, err := MakeInterval(start, end)
-
-	rSeq = IntervalSequence{i1}
-	return
-}
-
-func (seq IntervalSequence) Start() time.Time{
-	return seq[0].Start()
-}
-
-func (seq IntervalSequence) End() time.Time{
-	return seq[len(seq)-1].End()
-}
-
-func (seq IntervalSequence ) String() string {
-	nm, _ := seq.Start().Zone()
-	format := "Jan 2, 2006 3:04:05 PM"
-	return fmt.Sprintf("Interval Sequence[%d]||%s -> %s: %s dur[%s]", len(seq), seq.Start().Format(format), seq.End().Format(format), nm, seq.End().Sub(seq.Start()) )
-}
-
-func (seq IntervalSequence ) Join( in2 Interval ) (IntervalSequence, error) {
-	return IntervalSequence{}, errors.New("Not Implmented")
-}
-
-func (seq IntervalSequence) Split( spTime time.Time ) (  IntervalSequence,  error) {
-	return IntervalSequence{}, errors.New("Not Implmented")
+func(in intervalBase) Merge( in2 Interval )(  IntervalSequence,  error){
+	return IntervalSequence{}, errors.New("Not Implemented")
 }
 
